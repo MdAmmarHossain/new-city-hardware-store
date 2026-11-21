@@ -76,7 +76,7 @@
           <span id="top-confirmed-memo-count" class="bg-emerald-400 text-slate-950 px-1.5 py-0.2 rounded-full font-mono text-[11px]">0</span>
         </button>
 
-        <button onclick="openLiveOrdersModal()" class="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-full font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
+        <button onclick="openLiveOrdersModal()" class="hidden admin-only-btn bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-full font-bold text-xs items-center gap-1.5 transition cursor-pointer">
           <span>🔔 লাইভ অর্ডার</span>
           <span id="live-cloud-order-count" class="bg-amber-500 text-slate-950 px-1.5 py-0.2 rounded-full font-mono text-[11px]">0</span>
         </button>
@@ -115,7 +115,7 @@
             <button onclick="openConfirmedMemosModal()" class="bg-emerald-950 border border-emerald-700 text-emerald-300 px-2.5 py-2 rounded-xl text-xs font-bold cursor-pointer">
               🧾 মেমো (<span id="mobile-memo-count">0</span>)
             </button>
-            <button onclick="openLiveOrdersModal()" class="bg-slate-800 border border-slate-700 text-amber-400 px-2.5 py-2 rounded-xl text-xs font-bold cursor-pointer">
+            <button onclick="openLiveOrdersModal()" class="hidden admin-only-btn bg-slate-800 border border-slate-700 text-amber-400 px-2.5 py-2 rounded-xl text-xs font-bold cursor-pointer">
               🔔 (<span id="mobile-live-ord-count">0</span>)
             </button>
             <button onclick="toggleCart(true)" class="relative flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 px-3 py-2 rounded-xl transition cursor-pointer">
@@ -161,7 +161,7 @@
             <span id="desktop-memo-badge" class="bg-emerald-400 text-slate-950 text-xs font-extrabold px-2 py-0.5 rounded-full font-mono">0</span>
           </button>
 
-          <button onclick="openLiveOrdersModal()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/40 px-3.5 py-2.5 rounded-xl text-sm font-bold transition cursor-pointer">
+          <button onclick="openLiveOrdersModal()" class="hidden admin-only-btn items-center gap-2 bg-slate-800 hover:bg-slate-700 text-amber-400 border border-amber-500/40 px-3.5 py-2.5 rounded-xl text-sm font-bold transition cursor-pointer">
             <span>🔔 লাইভ অর্ডার</span>
             <span id="desktop-live-ord-badge" class="bg-amber-500 text-slate-950 text-xs font-extrabold px-2 py-0.5 rounded-full font-mono">0</span>
           </button>
@@ -485,9 +485,37 @@
 
   <script>
     // =========================================================
-    // FIREBASE REALTIME DATABASE CONFIGURATION (LIVE CLOUD SYNC)
+    // FIREBASE REALTIME DATABASE CONFIGURATION (PRIVACY ENABLED)
     // =========================================================
     const FIREBASE_DB_URL = "https://new-city-hardware-c8da1-default-rtdb.firebaseio.com";
+    const ADMIN_SECRET_PASS = "nch2026";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let isAdminMode = localStorage.getItem('nch_is_admin') === 'true';
+
+    if (urlParams.get('admin') === '1' && !isAdminMode) {
+      const entered = prompt("অ্যাডমিন পাসওয়ার্ড দিন:");
+      if (entered === ADMIN_SECRET_PASS) {
+        isAdminMode = true;
+        localStorage.setItem('nch_is_admin', 'true');
+        alert("অ্যাডমিন মোড চালু হয়েছে! এখন সবার অর্ডার দেখতে পাবেন।");
+      } else if (entered !== null) {
+        alert("ভুল পাসওয়ার্ড!");
+      }
+    } else if (urlParams.get('admin') === '0') {
+      isAdminMode = false;
+      localStorage.removeItem('nch_is_admin');
+    }
+
+    if (isAdminMode) {
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.admin-only-btn').forEach(btn => {
+          btn.classList.remove('hidden');
+          btn.classList.add('flex');
+        });
+      });
+    }
+
     let knownOrderIds = new Set(JSON.parse(localStorage.getItem('nch_known_cloud_ids') || '[]'));
     let cloudOrdersCache = [];
     let localConfirmedOrders = JSON.parse(localStorage.getItem('nch_local_confirmed_memos') || '[]');
@@ -496,7 +524,9 @@
     function getAllMergedOrders() {
       const map = new Map();
       localConfirmedOrders.forEach(o => { if (o && o.id) map.set(o.id, o); });
-      cloudOrdersCache.forEach(o => { if (o && o.id) map.set(o.id, o); });
+      if (isAdminMode) {
+        cloudOrdersCache.forEach(o => { if (o && o.id) map.set(o.id, o); });
+      }
       return Array.from(map.values()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
     }
 
@@ -518,7 +548,8 @@
         if (res.ok) {
           knownOrderIds.add(orderObj.id);
           localStorage.setItem('nch_known_cloud_ids', JSON.stringify([...knownOrderIds]));
-          fetchCloudOrders(false);
+          if (isAdminMode) fetchCloudOrders(false);
+          else refreshOrderAndMemoViews();
         }
       } catch (err) {
         console.error("Firebase Sync Error:", err);
@@ -526,6 +557,7 @@
     }
 
     async function updateCloudOrderStatus(orderId, newStatus) {
+      if (!isAdminMode) return;
       const localMatch = getAllMergedOrders().find(o => o.id === orderId);
       if (localMatch) {
         localMatch.status = newStatus;
@@ -545,6 +577,10 @@
     }
 
     async function fetchCloudOrders(notifyOnNew = true) {
+      if (!isAdminMode) {
+        refreshOrderAndMemoViews();
+        return;
+      }
       try {
         const res = await fetch(`${FIREBASE_DB_URL}/orders.json`);
         if (!res.ok) {
