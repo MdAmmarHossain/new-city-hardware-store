@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="bn" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>New City Hardware — Excel to CSV Converter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SheetJS Library for Excel Parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Hind Siliguri"', '"Inter"', 'sans-serif'],
+            mono: ['"Inter"', 'monospace'],
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { font-family: 'Hind Siliguri', 'Inter', sans-serif; background-color: #0F172A; color: #F8FAFC; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-slate-950">
+
+  <!-- Notification Toasts -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Header -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center shadow-md">
+          <svg class="w-6 h-6 text-slate-950" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-white leading-none">
+            New City <span class="text-amber-400">Hardware</span>
+          </h1>
+          <p class="text-xs text-slate-400 mt-0.5">Excel (.xlsx) to UTF-8 CSV Converter • প্রোডাক্ট সিঙ্ক টুল</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          ১০০% ব্রাউজার প্রসেসিং (নিরাপদ)
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 py-8 flex-1 w-full space-y-6">
+
+    <!-- Hero / File Upload Area -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+      <div class="absolute -top-24 -right-24 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="max-w-3xl mx-auto text-center space-y-3 mb-6">
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white">
+          আপনার <span class="text-amber-400 font-mono">products.xlsx</span> ফাইলটি ড্রপ বা সিলেক্ট করুন
+        </h2>
+        <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+          আপনার এক্সেল ফাইলের বাংলা ফন্ট, ক্যাটাগরি, ইউনিট এবং ছবির পাথ স্বয়ংক্রিয়ভাবে ক্লিন করে ওয়েবসাইট-ফ্রেন্ডলি UTF-8 <code class="text-amber-300 font-mono">products.csv</code> ফাইলে রূপান্তর করবে।
+        </p>
+      </div>
+
+      <!-- Drag & Drop Zone -->
+      <div id="drop-zone" onclick="document.getElementById('excel-file-input').click()" 
+           class="border-2 border-dashed border-slate-700 hover:border-amber-400/80 bg-slate-950/60 hover:bg-slate-950/90 transition-all rounded-2xl p-8 sm:p-12 text-center cursor-pointer flex flex-col items-center justify-center gap-4 group">
+        
+        <input type="file" id="excel-file-input" accept=".xlsx, .xls" class="hidden" onchange="handleFileSelect(event)" />
+
+        <div class="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-400 group-hover:scale-110 group-hover:bg-amber-500/20 transition flex items-center justify-center border border-amber-500/20">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+        </div>
+
+        <div>
+          <p class="text-base font-bold text-slate-200 group-hover:text-amber-400 transition">
+            এখানে ফাইল টেনে আনুন অথবা ক্লিক করে আপলোড করুন
+          </p>
+          <p class="text-xs text-slate-500 mt-1">সমর্থিত ফরম্যাট: .xlsx, .xls (সর্বোচ্চ সাইজ: ২০MB)</p>
+        </div>
+
+        <div id="file-info" class="hidden mt-2 inline-flex items-center gap-2 bg-slate-800 text-amber-300 text-xs font-mono px-3.5 py-1.5 rounded-xl border border-slate-700">
+          📄 <span id="file-name">filename.xlsx</span> (<span id="file-size">0 KB</span>)
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls & Stats Dashboard (Hidden until file uploaded) -->
+    <div id="dashboard-section" class="hidden space-y-6">
+
+      <!-- Configuration Header -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-lg">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-bold text-slate-400">এক্সেল শীট সিলেক্ট করুন:</span>
+          <select id="sheet-select" onchange="processCurrentSheet()" class="bg-slate-950 text-amber-400 border border-slate-700 rounded-xl px-3 py-2 text-xs font-bold outline-none focus:border-amber-400 cursor-pointer">
+          </select>
+        </div>
+
+        <div class="flex items-center gap-3 ml-auto">
+          <button onclick="copyCSVContent()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold px-4 py-2.5 rounded-xl text-xs flex items-center gap-2 transition cursor-pointer">
+            📋 CSV টেক্সট কপি করুন
+          </button>
+
+          <button onclick="downloadCSV()" class="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-extrabold px-5 py-2.5 rounded-xl text-xs sm:text-sm flex items-center gap-2 shadow-lg transition cursor-pointer">
+            ⬇️ products.csv ডাউনলোড করুন (UTF-8)
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md">
+          <p class="text-xs font-semibold text-slate-400">মোট রো (এক্সেল)</p>
+          <p id="stat-total-rows" class="text-2xl font-extrabold text-white font-mono mt-1">0</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md">
+          <p class="text-xs font-semibold text-slate-400">ভ্যালিড প্রোডাক্ট</p>
+          <p id="stat-valid-products" class="text-2xl font-extrabold text-emerald-400 font-mono mt-1">0</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md">
+          <p class="text-xs font-semibold text-slate-400">মোট ক্যাটাগরি</p>
+          <p id="stat-categories-count" class="text-2xl font-extrabold text-amber-400 font-mono mt-1">0</p>
+        </div>
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md">
+          <p class="text-xs font-semibold text-slate-400">সর্বমোট ইনভেন্টরি মান</p>
+          <p id="stat-total-value" class="text-xl sm:text-2xl font-extrabold text-orange-400 font-mono mt-1">৳0</p>
+        </div>
+      </div>
+
+      <!-- Auto Formatting Applied Rules Note -->
+      <div class="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 text-xs text-amber-200/90 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-base">⚡</span>
+          <span><strong>স্বয়ংক্রিয় ক্লিনআপ রুলস:</strong> Unit uppercase করা হয়েছে, খালি Category-তে 'General Hardware' বসানো হয়েছে, খালি Image-এ Model দিয়ে `images/<Model>.jpg` তৈরি হয়েছে এবং খালি প্রোডাক্ট রো বাদ দেওয়া হয়েছে।</span>
+        </div>
+      </div>
+
+      <!-- Preview Table Container -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col">
+        <!-- Table Search & Filter Bar -->
+        <div class="p-4 border-b border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 bg-slate-900/80">
+          <div class="flex items-center gap-2">
+            <h3 class="font-bold text-sm text-white flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              প্রিভিউ টেবিল (Preview)
+            </h3>
+            <span id="preview-count" class="text-xs bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded-full font-mono">0 টি পাওয়া গেছে</span>
+          </div>
+
+          <div class="relative w-full sm:w-72">
+            <input type="text" id="table-search" oninput="filterPreviewTable()" placeholder="প্রোডাক্ট নাম বা মডেল দিয়ে খুঁজুন..." class="w-full bg-slate-950 border border-slate-700 text-white placeholder-slate-500 rounded-xl px-3.5 py-2 text-xs outline-none focus:border-amber-400" />
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto max-h-[500px] overflow-y-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="sticky top-0 bg-slate-950 text-slate-300 border-b border-slate-800 font-bold uppercase tracking-wider text-[11px]">
+              <tr>
+                <th class="py-3 px-3 text-center w-12">#</th>
+                <th class="py-3 px-4">Product Name (পণ্যের নাম)</th>
+                <th class="py-3 px-3">Model</th>
+                <th class="py-3 px-3">Unit</th>
+                <th class="py-3 px-3">Category</th>
+                <th class="py-3 px-4 text-right">Retail Price (BDT)</th>
+                <th class="py-3 px-4">Image Path</th>
+              </tr>
+            </thead>
+            <tbody id="preview-tbody" class="divide-y divide-slate-800/60 font-medium text-slate-200">
+              <!-- Rows injected by JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination / Status Footer -->
+        <div class="p-3 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <span id="pagination-info">দেখানো হচ্ছে 0 টি প্রোডাক্ট</span>
+          <span>ডাউনলোড বাটন চাপলে ফাইলটি <strong class="text-amber-400">UTF-8 BOM</strong> সহ সেভ হবে।</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- GitHub Upload Instructions Card -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+      <h3 class="font-bold text-base text-white flex items-center gap-2">
+        <span class="text-amber-400">🚀</span> ওয়েবসাইট আপডেট করার ধাপসমূহ:
+      </h3>
+      <ol class="list-decimal list-inside space-y-2 text-xs sm:text-sm text-slate-300 leading-relaxed">
+        <li>উপরের <strong class="text-amber-400 font-mono">products.csv</strong> বাটনে ক্লিক করে ফাইলটি কম্পিউটারে ডাউনলোড করুন।</li>
+        <li>আপনার **GitHub Repository**-তে প্রবেশ করুন।</li>
+        <li>পূর্বে থাকা <code class="bg-slate-800 text-amber-300 px-1.5 py-0.5 rounded font-mono">products.csv</code> ফাইলের ওপর ডাউনলোড করা নতুন ফাইলটি **Upload / Commit** করুন।</li>
+        <li>১ থেকে ২ মিনিটের মধ্যে আপনার ওয়েবসাইটে নতুন দাম ও প্রোডাক্ট লাইভ আপডেট হয়ে যাবে!</li>
+      </ol>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4">
+      <p>© 2026 New City Hardware (নিউ সিটি হার্ডওয়্যার) — বগুড়া সদর, বগুড়া। সর্বস্বত্ব সংরক্ষিত।</p>
+    </div>
+  </footer>
+
+  <!-- JavaScript Logic -->
+  <script>
+    let rawWorkbook = null;
+    let processedProducts = [];
+    let filteredProducts = [];
+
+    // Drag and drop handlers
+    const dropZone = document.getElementById('drop-zone');
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.add('border-amber-400', 'bg-slate-950/90'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => dropZone.classList.remove('border-amber-400', 'bg-slate-950/90'), false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length > 0) {
+        document.getElementById('excel-file-input').files = files;
+        handleFile(files[0]);
+      }
+    });
+
+    function handleFileSelect(e) {
+      const files = e.target.files;
+      if (files.length > 0) {
+        handleFile(files[0]);
+      }
+    }
+
+    function handleFile(file) {
+      if (!file.name.match(/\.(xlsx|xls)$/i)) {
+        showToast("⚠️ অনুগ্রহ করে .xlsx বা .xls এক্সেল ফাইল সিলেক্ট করুন!");
+        return;
+      }
+
+      // Show File Info Badge
+      document.getElementById('file-name').textContent = file.name;
+      document.getElementById('file-size').textContent = (file.size / 1024).toFixed(1) + " KB";
+      document.getElementById('file-info').classList.remove('hidden');
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          rawWorkbook = XLSX.read(data, { type: 'array' });
+
+          populateSheetDropdown(rawWorkbook);
+          document.getElementById('dashboard-section').classList.remove('hidden');
+          showToast(`✓ এক্সেল ফাইল লোড হয়েছে (${rawWorkbook.SheetNames.length} টি শীট পাওয়া গেছে)`);
+
+          // Auto scroll to dashboard
+          document.getElementById('dashboard-section').scrollIntoView({ behavior: 'smooth' });
+        } catch (err) {
+          console.error(err);
+          showToast("❌ ফাইলটি পড়তে সমস্যা হয়েছে। ফাইলটি সঠিক কিনা যাচাই করুন।");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function populateSheetDropdown(workbook) {
+      const select = document.getElementById('sheet-select');
+      select.innerHTML = '';
+      
+      let defaultSheetIndex = 0;
+      workbook.SheetNames.forEach((sheetName, idx) => {
+        const option = document.createElement('option');
+        option.value = sheetName;
+        option.textContent = sheetName;
+        select.appendChild(option);
+
+        // Auto select 'Products' sheet if present
+        if (sheetName.toLowerCase() === 'products') {
+          defaultSheetIndex = idx;
+        }
+      });
+
+      select.selectedIndex = defaultSheetIndex;
+      processCurrentSheet();
+    }
+
+    function processCurrentSheet() {
+      if (!rawWorkbook) return;
+      const sheetName = document.getElementById('sheet-select').value;
+      const worksheet = rawWorkbook.Sheets[sheetName];
+
+      if (!worksheet) return;
+
+      // Convert sheet to JSON rows
+      const rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+      processedProducts = [];
+      let totalValue = 0;
+      const categoriesSet = new Set();
+
+      rawRows.forEach((row) => {
+        // Find columns dynamically (flexible header matching)
+        const nameKey = Object.keys(row).find(k => k.trim().toLowerCase().includes('name') || k.trim().includes('নাম')) || 'Product Name';
+        const modelKey = Object.keys(row).find(k => k.trim().toLowerCase().includes('model') || k.trim().includes('মডেল')) || 'Model';
+        const unitKey = Object.keys(row).find(k => k.trim().toLowerCase().includes('unit') || k.trim().includes('ইউনিট')) || 'Unit';
+        const catKey = Object.keys(row).find(k => k.trim().toLowerCase().includes('cat') || k.trim().includes('ক্যাটাগরি')) || 'Category';
+        const priceKey = Object.keys(row).find(k => k.trim().toLowerCase().includes('price') || k.trim().toLowerCase().includes('bdt') || k.trim().includes('দাম')) || 'Retail Price (BDT)';
+        const imgKey = Object.keys(row).find(k => k.trim().toLowerCase().includes('img') || k.trim().toLowerCase().includes('image') || k.trim().includes('ছবি')) || 'Image';
+
+        const name = String(row[nameKey] || "").trim();
+        const model = String(row[modelKey] || "").trim();
+        let unit = String(row[unitKey] || "PC").trim().toUpperCase();
+        let cat = String(row[catKey] || "").trim();
+        let price = parseFloat(row[priceKey]);
+        if (isNaN(price)) price = 0;
+        let image = String(row[imgKey] || "").trim();
+
+        // Skip rows without a Product Name
+        if (!name) return;
+
+        // Apply Cleaning Rules
+        if (!cat) cat = "General Hardware";
+        if (!unit) unit = "PC";
+        if (!image && model) {
+          image = `images/${model}.jpg`;
+        }
+
+        categoriesSet.add(cat);
+        totalValue += price;
+
+        processedProducts.push({
+          name,
+          model,
+          unit,
+          cat,
+          price,
+          image
+        });
+      });
+
+      // Update Dashboard Stats
+      document.getElementById('stat-total-rows').textContent = rawRows.length.toLocaleString();
+      document.getElementById('stat-valid-products').textContent = processedProducts.length.toLocaleString();
+      document.getElementById('stat-categories-count').textContent = categoriesSet.size.toLocaleString();
+      document.getElementById('stat-total-value').textContent = `৳${totalValue.toLocaleString()}`;
+
+      filteredProducts = [...processedProducts];
+      renderPreviewTable();
+    }
+
+    function filterPreviewTable() {
+      const q = (document.getElementById('table-search').value || "").toLowerCase().trim();
+      if (!q) {
+        filteredProducts = [...processedProducts];
+      } else {
+        filteredProducts = processedProducts.filter(p => 
+          p.name.toLowerCase().includes(q) || 
+          p.model.toLowerCase().includes(q) ||
+          p.cat.toLowerCase().includes(q)
+        );
+      }
+      renderPreviewTable();
+    }
+
+    function renderPreviewTable() {
+      const tbody = document.getElementById('preview-tbody');
+      document.getElementById('preview-count').textContent = `${filteredProducts.length} টি পাওয়া গেছে`;
+      document.getElementById('pagination-info').textContent = `মোট ${processedProducts.length} টির মধ্যে ${filteredProducts.length} টি দেখানো হচ্ছে`;
+
+      if (filteredProducts.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-8 text-center text-slate-500">
+              কোনো প্রোডাক্ট পাওয়া যায়নি!
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      // Render up to 200 items in preview to ensure fast performance
+      const displayLimit = 200;
+      const itemsToDisplay = filteredProducts.slice(0, displayLimit);
+
+      tbody.innerHTML = itemsToDisplay.map((p, idx) => `
+        <tr class="${idx % 2 === 1 ? 'bg-slate-900/40' : 'bg-slate-950/40'} hover:bg-slate-800/50 transition">
+          <td class="py-2.5 px-3 text-center font-mono text-slate-400">${idx + 1}</td>
+          <td class="py-2.5 px-4 font-bold text-white">${escapeHtml(p.name)}</td>
+          <td class="py-2.5 px-3 font-mono font-bold text-amber-400">${escapeHtml(p.model || '-')}</td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20">${escapeHtml(p.unit)}</span>
+          </td>
+          <td class="py-2.5 px-3">
+            <span class="px-2 py-0.5 rounded text-[11px] bg-slate-800 text-slate-300 border border-slate-700">${escapeHtml(p.cat)}</span>
+          </td>
+          <td class="py-2.5 px-4 text-right font-mono font-extrabold text-emerald-400">৳${p.price.toLocaleString()}</td>
+          <td class="py-2.5 px-4 font-mono text-[11px] text-slate-400 truncate max-w-[180px]">${escapeHtml(p.image)}</td>
+        </tr>
+      `).join('');
+
+      if (filteredProducts.length > displayLimit) {
+        tbody.innerHTML += `
+          <tr>
+            <td colspan="7" class="py-3 text-center text-xs text-amber-400 font-semibold bg-amber-500/5 border-t border-slate-800">
+              ... আরও ${(filteredProducts.length - displayLimit).toLocaleString()} টি প্রোডাক্ট টেবিলের নিচে রয়েছে। ডাউনলোডে সব প্রোডাক্ট যুক্ত হবে।
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    function generateCSVString() {
+      const headers = ["Product Name", "Model", "Unit", "Category", "Retail Price (BDT)", "Image"];
+      
+      const lines = [];
+      // Header line
+      lines.push(headers.map(escapeCSVField).join(','));
+
+      // Rows
+      processedProducts.forEach(p => {
+        const row = [
+          p.name,
+          p.model,
+          p.unit,
+          p.cat,
+          p.price,
+          p.image
+        ];
+        lines.push(row.map(escapeCSVField).join(','));
+      });
+
+      return lines.join('\n');
+    }
+
+    function escapeCSVField(field) {
+      if (field === null || field === undefined) return '""';
+      const str = String(field);
+      if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+        return '"' + str.replace(/"/g, '""') + '"';
+      }
+      return str;
+    }
+
+    function downloadCSV() {
+      if (processedProducts.length === 0) {
+        showToast("⚠️ ডাটা খালি! ডাউনলোড করার মতো কোনো প্রোডাক্ট নেই।");
+        return;
+      }
+
+      const csvContent = generateCSVString();
+      // UTF-8 BOM byte marker so Excel opens Bengali correctly
+      const bom = "\uFEFF"; 
+      const blob = new Blob([bom + csvContent], { type: "text/csv;charset=utf-8;" });
+      
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "products.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      showToast(`✅ products.csv ডাউনলোড সম্পন্ন! (${processedProducts.length} টি প্রোডাক্ট)`);
+    }
+
+    function copyCSVContent() {
+      if (processedProducts.length === 0) {
+        showToast("⚠️ ডাটা খালি!");
+        return;
+      }
+      const csv = generateCSVString();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(csv).then(() => {
+          showToast("📋 CSV টেক্সট ক্লিপবোর্ডে কপি হয়েছে!");
+        });
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = csv;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast("📋 CSV টেক্সট ক্লিপবোর্ডে কপি হয়েছে!");
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function showToast(message) {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'bg-slate-900 text-white border border-amber-500/50 px-4 py-3 rounded-xl shadow-2xl text-xs sm:text-sm font-medium flex items-center gap-2.5 transition-all duration-300 pointer-events-auto';
+      toast.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
