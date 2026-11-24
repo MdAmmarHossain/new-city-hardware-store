@@ -25,7 +25,7 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* A4 সিলেক্ট থাকলেও একদম Top-Left থেকে A5 সাইজে প্রিন্ট হওয়ার সেটিংস */
+    /* A4 সিলেক্ট থাকলেও একদম ওপর থেকে মাঝখানে (Top-Center) A5 সাইজে প্রিন্ট হওয়ার সেটিংস */
     @page {
       size: A4 portrait;
       margin: 0mm;
@@ -46,7 +46,8 @@
       #a5-memo-print-sheet {
         position: fixed !important;
         top: 4mm !important;
-        left: 4mm !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
         width: 140mm !important;
         max-width: 140mm !important;
         min-height: auto !important;
