@@ -28,25 +28,64 @@
     /* A5 পেজ প্রিন্ট সেটিংস */
     @page {
       size: A5 portrait;
-      margin: 8mm;
+      margin: 4mm;
     }
 
     @media print {
-      body * { visibility: hidden !important; }
-      #a5-memo-print-sheet, #a5-memo-print-sheet * { visibility: visible !important; }
+      html, body {
+        width: 148mm !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        overflow: visible !important;
+      }
+      body * {
+        visibility: hidden !important;
+      }
+      #a5-memo-modal {
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        overflow: visible !important;
+      }
+      #a5-memo-modal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: transparent !important;
+      }
+      #a5-memo-modal > div > div:last-child {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #ffffff !important;
+      }
+      #a5-memo-print-sheet, #a5-memo-print-sheet * {
+        visibility: visible !important;
+      }
       #a5-memo-print-sheet {
-        position: fixed !important;
-        left: 0 !important;
-        top: 0 !important;
+        position: static !important;
+        left: auto !important;
+        top: auto !important;
         width: 100% !important;
         max-width: 100% !important;
+        min-height: auto !important;
+        height: auto !important;
         margin: 0 !important;
-        padding: 4mm !important;
+        padding: 3mm !important;
         border: 1.5px solid #0f172a !important;
         box-shadow: none !important;
         background: #ffffff !important;
         color: #000000 !important;
         font-size: 11px !important;
+        display: block !important;
       }
       .no-print { display: none !important; }
     }
@@ -72,12 +111,12 @@
       <div class="flex items-center gap-3 ml-auto">
         <!-- আলাদা কনফার্মড মেমো অপশন বাটন -->
         <button onclick="openConfirmedMemosModal()" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-full font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
-          <span>🧾 কনফার্মড মেমো (A5)</span>
+          <span>🧾 আজকের মেমো (A5)</span>
           <span id="top-confirmed-memo-count" class="bg-emerald-400 text-slate-950 px-1.5 py-0.2 rounded-full font-mono text-[11px]">0</span>
         </button>
 
         <button onclick="openLiveOrdersModal()" class="hidden admin-only-btn bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 px-3 py-1 rounded-full font-bold text-xs items-center gap-1.5 transition cursor-pointer">
-          <span>🔔 লাইভ অর্ডার</span>
+          <span>🔔 আজকের অর্ডার</span>
           <span id="live-cloud-order-count" class="bg-amber-500 text-slate-950 px-1.5 py-0.2 rounded-full font-mono text-[11px]">0</span>
         </button>
 
@@ -319,10 +358,10 @@
 
       <div class="p-4 sm:p-6 bg-slate-100 space-y-4">
         <!-- A5 SIZE MEMO SHEET -->
-        <div id="a5-memo-print-sheet" class="mx-auto bg-white border-2 border-slate-900 rounded-lg p-5 shadow-sm text-slate-900" style="max-width: 148mm; min-height: 195mm; display: flex; flex-direction: column; justify-content: space-between;">
+        <div id="a5-memo-print-sheet" class="mx-auto bg-white border-2 border-slate-900 rounded-lg p-4 shadow-sm text-slate-900" style="max-width: 140mm; display: flex; flex-direction: column; justify-content: space-between;">
           <div>
             <!-- Memo Header -->
-            <div class="border-b-2 border-slate-900 pb-2.5 mb-3 flex items-start justify-between">
+            <div class="border-b-2 border-slate-900 pb-2 mb-2.5 flex items-start justify-between">
               <div>
                 <div class="inline-block bg-slate-900 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded mb-1">ক্যাশ মেমো / CASH MEMO (A5)</div>
                 <h2 class="text-xl font-extrabold tracking-tight text-slate-900 leading-none">New City Hardware</h2>
@@ -341,7 +380,7 @@
             </div>
 
             <!-- Customer Box -->
-            <div class="border border-slate-400 rounded-md p-2.5 mb-3 bg-slate-50/70 text-xs space-y-1">
+            <div class="border border-slate-400 rounded-md p-2 mb-2.5 bg-slate-50/70 text-xs space-y-1">
               <div class="flex flex-wrap justify-between gap-2">
                 <span><strong>ক্রেতার নাম:</strong> <span id="memo-cust-name"></span></span>
                 <span><strong>মোবাইল:</strong> <span id="memo-cust-phone" class="font-mono font-bold"></span></span>
@@ -369,7 +408,7 @@
           </div>
 
           <!-- Totals & Signature Footer -->
-          <div class="mt-4 pt-2">
+          <div class="mt-3 pt-1.5">
             <div class="flex justify-end">
               <div class="w-56 text-xs space-y-1 border border-slate-800 rounded p-2 bg-slate-50">
                 <div class="flex justify-between">
@@ -387,7 +426,7 @@
               </div>
             </div>
 
-            <div class="mt-8 pt-2 flex items-end justify-between text-[11px] text-slate-700">
+            <div class="mt-6 pt-2 flex items-end justify-between text-[11px] text-slate-700">
               <div class="text-center">
                 <div class="w-28 border-t border-slate-700 pt-1">ক্রেতার স্বাক্ষর</div>
               </div>
@@ -417,7 +456,7 @@
     </div>
   </div>
 
-  <!-- SEPARATE CONFIRMED MEMOS SECTION MODAL -->
+  <!-- SEPARATE CONFIRMED MEMOS SECTION MODAL (WITH DATE-WISE FILTER) -->
   <div id="confirmed-memos-modal" class="fixed inset-0 bg-slate-950/75 z-50 hidden items-center justify-center p-4 overflow-y-auto no-print">
     <div class="bg-white rounded-2xl max-w-4xl w-full overflow-hidden shadow-2xl border border-slate-200 my-8 flex flex-col max-h-[88vh]">
       <div class="bg-emerald-950 text-white px-5 py-4 flex items-center justify-between shrink-0 border-b border-emerald-800">
@@ -425,7 +464,7 @@
           <span class="w-9 h-9 rounded-xl bg-emerald-500 text-slate-950 flex items-center justify-center font-extrabold text-lg">🧾</span>
           <div>
             <h3 class="font-bold text-lg text-emerald-300">কনফার্মড মেমো ও A5 প্রিন্ট সেন্টার</h3>
-            <p class="text-xs text-emerald-100/75">সব কনফার্ম হওয়া অর্ডারের মেমো এখানে আলাদাভাবে সংরক্ষিত আছে — যেকোনো মেমো ওপেন করে A5 প্রিন্ট করুন</p>
+            <p class="text-xs text-emerald-100/75">রানিং তারিখ ও ব্যাক-ডেটের মেমো আলাদাভাবে দেখুন ও A5 প্রিন্ট করুন</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -434,9 +473,28 @@
         </div>
       </div>
 
-      <div class="p-4 bg-emerald-50/60 border-b border-emerald-100 flex flex-wrap items-center justify-between gap-2 shrink-0">
+      <!-- Date Wise Filter Tabs for Confirmed Memos -->
+      <div class="px-4 pt-3 pb-2 bg-emerald-900/10 border-b border-emerald-100 flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="setMemoDateMode('today')" id="memo-tab-today" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-emerald-700 text-white">
+            📅 আজকের মেমো (<span id="memo-count-today">0</span>)
+          </button>
+          <button onclick="setMemoDateMode('backdate')" id="memo-tab-backdate" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-slate-700 border border-slate-200">
+            🗂️ ব্যাক-ডেট মেমো (<span id="memo-count-backdate">0</span>)
+          </button>
+          <button onclick="setMemoDateMode('all')" id="memo-tab-all" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-slate-700 border border-slate-200">
+            সব মেমো (<span id="memo-count-all">0</span>)
+          </button>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-[11px] font-bold text-slate-600">তারিখ বাছাই:</span>
+          <input type="date" id="memo-specific-date" onchange="handleMemoSpecificDateChange(this.value)" class="bg-white border border-emerald-300 rounded-lg px-2.5 py-1 text-xs font-mono outline-none" />
+        </div>
+      </div>
+
+      <div class="p-3.5 bg-emerald-50/60 border-b border-emerald-100 flex flex-wrap items-center justify-between gap-2 shrink-0">
         <input type="text" id="memo-search-input" oninput="renderConfirmedMemosList()" placeholder="মেমো নং (#NCH-...), ক্রেতার নাম বা মোবাইল নম্বর দিয়ে খুঁজুন..." class="flex-1 min-w-[220px] bg-white border border-emerald-200 rounded-xl px-3.5 py-2 text-xs outline-none focus:border-emerald-500" />
-        <span class="text-xs font-bold text-emerald-900">মোট কনফার্মড মেমো: <span id="confirmed-memo-total-label" class="font-mono">0</span> টি</span>
+        <span class="text-xs font-bold text-emerald-900">প্রদর্শিত মেমো: <span id="confirmed-memo-total-label" class="font-mono">0</span> টি</span>
       </div>
 
       <div id="confirmed-memos-list" class="p-5 overflow-y-auto space-y-3 bg-slate-50 flex-1">
@@ -445,15 +503,15 @@
     </div>
   </div>
 
-  <!-- LIVE CLOUD ORDERS DASHBOARD MODAL -->
+  <!-- LIVE CLOUD ORDERS DASHBOARD MODAL (WITH DATE-WISE SEPARATION) -->
   <div id="live-orders-modal" class="fixed inset-0 bg-slate-950/75 z-50 hidden items-center justify-center p-4 overflow-y-auto no-print">
     <div class="bg-white rounded-2xl max-w-3xl w-full overflow-hidden shadow-2xl border border-slate-200 my-8 flex flex-col max-h-[88vh]">
       <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-2.5">
           <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
           <div>
-            <h3 class="font-bold text-lg text-amber-400">লাইভ ক্লাউড অর্ডার ড্যাশবোর্ড (Firebase Sync)</h3>
-            <p class="text-[11px] text-slate-400">মোবাইল অ্যাপ বা ওয়েবসাইট থেকে আসা অর্ডার কনফার্ম ও মেমো তৈরি করুন</p>
+            <h3 class="font-bold text-lg text-amber-400">লাইভ ক্লাউড অর্ডার ড্যাশবোর্ড</h3>
+            <p class="text-[11px] text-slate-400">আজকের রানিং অর্ডার এবং ব্যাক-ডেটের পুরনো অর্ডার আলাদাভাবে দেখুন</p>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -461,6 +519,26 @@
           <button onclick="closeLiveOrdersModal()" class="text-slate-400 hover:text-white px-2 cursor-pointer">✕</button>
         </div>
       </div>
+
+      <!-- Date-Wise Filter Bar for Orders -->
+      <div class="px-4 py-3 bg-slate-100 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button onclick="setOrderDateMode('today')" id="ord-tab-today" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-slate-900 text-amber-400">
+            🟢 আজকের অর্ডার (<span id="ord-count-today">0</span>)
+          </button>
+          <button onclick="setOrderDateMode('backdate')" id="ord-tab-backdate" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-slate-700 border border-slate-300">
+            🗂️ ব্যাক-ডেট অর্ডার (<span id="ord-count-backdate">0</span>)
+          </button>
+          <button onclick="setOrderDateMode('all')" id="ord-tab-all" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-slate-700 border border-slate-300">
+            সব অর্ডার (<span id="ord-count-all">0</span>)
+          </button>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="text-[11px] font-bold text-slate-600">তারিখ:</span>
+          <input type="date" id="order-specific-date" onchange="handleOrderSpecificDateChange(this.value)" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs font-mono outline-none" />
+        </div>
+      </div>
+
       <div id="cloud-orders-list" class="p-5 overflow-y-auto space-y-3 bg-slate-50 flex-1">
         <p class="text-center text-sm text-slate-500 py-8">ক্লাউড ডাটাবেজ থেকে অর্ডার লোড হচ্ছে...</p>
       </div>
@@ -520,6 +598,119 @@
     let cloudOrdersCache = [];
     let localConfirmedOrders = JSON.parse(localStorage.getItem('nch_local_confirmed_memos') || '[]');
     let activeMemoOrder = null;
+
+    // Date-wise filtering states ('today' | 'backdate' | 'specific' | 'all')
+    let orderDateMode = 'today';
+    let orderSpecificDate = '';
+    let memoDateMode = 'today';
+    let memoSpecificDate = '';
+
+    // Helper: Get local YYYY-MM-DD key
+    function getLocalDateKey(dateInput) {
+      const d = dateInput ? new Date(dateInput) : new Date();
+      if (isNaN(d.getTime())) return '';
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function getOrderDateKey(order) {
+      if (order.dateKey) return order.dateKey;
+      if (order.timestamp) return getLocalDateKey(order.timestamp);
+      if (order.date) {
+        const parsed = new Date(order.date);
+        if (!isNaN(parsed.getTime())) return getLocalDateKey(parsed);
+      }
+      return getLocalDateKey();
+    }
+
+    function formatDisplayDateGroup(dateKey) {
+      const todayKey = getLocalDateKey();
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayKey = getLocalDateKey(yesterday);
+
+      if (dateKey === todayKey) return `🟢 আজকের অর্ডার (${dateKey})`;
+      if (dateKey === yesterdayKey) return `🟡 গতকালের অর্ডার (${dateKey})`;
+      return `📅 তারিখ: ${dateKey}`;
+    }
+
+    function filterOrdersByDateMode(list, mode, specificDate) {
+      const todayKey = getLocalDateKey();
+      if (mode === 'today') {
+        return list.filter(o => getOrderDateKey(o) === todayKey);
+      }
+      if (mode === 'backdate') {
+        return list.filter(o => getOrderDateKey(o) < todayKey);
+      }
+      if (mode === 'specific' && specificDate) {
+        return list.filter(o => getOrderDateKey(o) === specificDate);
+      }
+      return list;
+    }
+
+    function setOrderDateMode(mode) {
+      orderDateMode = mode;
+      if (mode !== 'specific') {
+        orderSpecificDate = '';
+        const inp = document.getElementById('order-specific-date');
+        if (inp) inp.value = '';
+      }
+      updateOrderDateTabStyles();
+      renderCloudOrdersModal();
+    }
+
+    function handleOrderSpecificDateChange(val) {
+      if (!val) {
+        setOrderDateMode('today');
+        return;
+      }
+      orderSpecificDate = val;
+      orderDateMode = 'specific';
+      updateOrderDateTabStyles();
+      renderCloudOrdersModal();
+    }
+
+    function updateOrderDateTabStyles() {
+      const activeCls = 'px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-slate-900 text-amber-400';
+      const inactiveCls = 'px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-slate-700 border border-slate-300';
+      ['today', 'backdate', 'all'].forEach(m => {
+        const btn = document.getElementById(`ord-tab-${m}`);
+        if (btn) btn.className = (orderDateMode === m) ? activeCls : inactiveCls;
+      });
+    }
+
+    function setMemoDateMode(mode) {
+      memoDateMode = mode;
+      if (mode !== 'specific') {
+        memoSpecificDate = '';
+        const inp = document.getElementById('memo-specific-date');
+        if (inp) inp.value = '';
+      }
+      updateMemoDateTabStyles();
+      renderConfirmedMemosList();
+    }
+
+    function handleMemoSpecificDateChange(val) {
+      if (!val) {
+        setMemoDateMode('today');
+        return;
+      }
+      memoSpecificDate = val;
+      memoDateMode = 'specific';
+      updateMemoDateTabStyles();
+      renderConfirmedMemosList();
+    }
+
+    function updateMemoDateTabStyles() {
+      const activeCls = 'px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-emerald-700 text-white';
+      const inactiveCls = 'px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-slate-700 border border-slate-200';
+      ['today', 'backdate', 'all'].forEach(m => {
+        const btn = document.getElementById(`memo-tab-${m}`);
+        if (btn) btn.className = (memoDateMode === m) ? activeCls : inactiveCls;
+      });
+    }
 
     function getAllMergedOrders() {
       const map = new Map();
@@ -610,21 +801,38 @@
 
     function refreshOrderAndMemoViews() {
       const allOrders = getAllMergedOrders();
-      const confirmedMemos = allOrders.filter(o => ['Confirmed', 'Packed', 'Delivered'].includes(o.status || 'Confirmed'));
+      const todayKey = getLocalDateKey();
 
-      updateCloudOrderBadges(allOrders.length, confirmedMemos.length);
+      const todayOrders = allOrders.filter(o => getOrderDateKey(o) === todayKey);
+      const backdateOrders = allOrders.filter(o => getOrderDateKey(o) < todayKey);
+
+      const allConfirmed = allOrders.filter(o => ['Confirmed', 'Packed', 'Delivered'].includes(o.status || 'Confirmed'));
+      const todayMemos = allConfirmed.filter(o => getOrderDateKey(o) === todayKey);
+      const backdateMemos = allConfirmed.filter(o => getOrderDateKey(o) < todayKey);
+
+      updateCloudOrderBadges(todayOrders.length, todayMemos.length);
+
+      const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      setTxt('ord-count-today', todayOrders.length);
+      setTxt('ord-count-backdate', backdateOrders.length);
+      setTxt('ord-count-all', allOrders.length);
+
+      setTxt('memo-count-today', todayMemos.length);
+      setTxt('memo-count-backdate', backdateMemos.length);
+      setTxt('memo-count-all', allConfirmed.length);
+
       renderCloudOrdersModal();
       renderConfirmedMemosList();
     }
 
-    function updateCloudOrderBadges(totalOrders, totalMemos) {
+    function updateCloudOrderBadges(todayOrdersCount, todayMemosCount) {
       ['live-cloud-order-count', 'mobile-live-ord-count', 'desktop-live-ord-badge'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.textContent = totalOrders;
+        if (el) el.textContent = todayOrdersCount;
       });
-      ['top-confirmed-memo-count', 'mobile-memo-count', 'desktop-memo-badge', 'confirmed-memo-total-label'].forEach(id => {
+      ['top-confirmed-memo-count', 'mobile-memo-count', 'desktop-memo-badge'].forEach(id => {
         const el = document.getElementById(id);
-        if (el) el.textContent = totalMemos;
+        if (el) el.textContent = todayMemosCount;
       });
     }
 
@@ -714,6 +922,7 @@
       const m = document.getElementById('confirmed-memos-modal');
       m.classList.remove('hidden');
       m.classList.add('flex');
+      updateMemoDateTabStyles();
       renderConfirmedMemosList();
     }
 
@@ -729,56 +938,87 @@
 
       const q = (document.getElementById('memo-search-input')?.value || '').toLowerCase().trim();
       const allOrders = getAllMergedOrders();
-      const confirmedMemos = allOrders.filter(o => {
-        const isConfirmed = ['Confirmed', 'Packed', 'Delivered'].includes(o.status || 'Confirmed');
-        if (!isConfirmed) return false;
-        if (!q) return true;
-        return (o.id || '').toLowerCase().includes(q) ||
-               (o.customer?.name || '').toLowerCase().includes(q) ||
-               (o.customer?.phone || '').toLowerCase().includes(q);
-      });
+      let confirmedMemos = allOrders.filter(o => ['Confirmed', 'Packed', 'Delivered'].includes(o.status || 'Confirmed'));
+
+      confirmedMemos = filterOrdersByDateMode(confirmedMemos, memoDateMode, memoSpecificDate);
+
+      if (q) {
+        confirmedMemos = confirmedMemos.filter(o =>
+          (o.id || '').toLowerCase().includes(q) ||
+          (o.customer?.name || '').toLowerCase().includes(q) ||
+          (o.customer?.phone || '').toLowerCase().includes(q)
+        );
+      }
+
+      const countLbl = document.getElementById('confirmed-memo-total-label');
+      if (countLbl) countLbl.textContent = confirmedMemos.length;
 
       if (confirmedMemos.length === 0) {
-        container.innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">এখনো কোনো কনফার্মড মেমো পাওয়া যায়নি। অর্ডার কনফার্ম করলে এখানে মেমো জমা হবে!</div>`;
+        const emptyMsg = memoDateMode === 'today'
+          ? 'আজকের তারিখে এখনো কোনো কনফার্মড মেমো তৈরি হয়নি। ব্যাক-ডেট মেমো দেখতে উপরের "ব্যাক-ডেট মেমো" বাটনে ক্লিক করুন।'
+          : 'এই ফিল্টারে কোনো কনফার্মড মেমো পাওয়া যায়নি।';
+        container.innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">${emptyMsg}</div>`;
         return;
       }
 
-      container.innerHTML = confirmedMemos.map(ord => `
-        <div class="bg-white border border-emerald-200 hover:border-emerald-500 rounded-xl p-4 shadow-2xs transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div class="space-y-1">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="font-mono font-extrabold text-slate-900 text-sm">#${ord.id}</span>
-              <span class="text-[11px] font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-full">✓ ${ord.status || 'Confirmed'}</span>
-              <span class="text-[11px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded">${ord.source || 'Web Store'}</span>
-              <span class="text-[11px] text-slate-500">${ord.date || ''}</span>
-            </div>
-            <div class="text-xs text-slate-800">
-              <strong>ক্রেতা:</strong> ${ord.customer?.name || ''} • <span class="font-mono">${ord.customer?.phone || ''}</span>
-            </div>
-            <div class="text-[11px] text-slate-500">
-              মোট আইটেম: <strong>${(ord.items || []).length} টি</strong> (${(ord.items || []).map(i => `${i.name} × ${i.qty} ${i.unit || 'PCS'}`).join(', ')})
-            </div>
-          </div>
+      const groups = new Map();
+      confirmedMemos.forEach(ord => {
+        const dk = getOrderDateKey(ord);
+        if (!groups.has(dk)) groups.set(dk, []);
+        groups.get(dk).push(ord);
+      });
 
-          <div class="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0">
-            <div class="text-base font-extrabold text-emerald-700 font-mono">৳${(ord.total || 0).toLocaleString()}</div>
-            <div class="flex items-center gap-1.5">
-              <button onclick="openA5MemoForOrder('${ord.id}', false)" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer">
-                🧾 মেমো দেখুন
-              </button>
-              <button onclick="openA5MemoForOrder('${ord.id}', true)" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold cursor-pointer">
-                🖨️ A5 প্রিন্ট
-              </button>
+      let html = '';
+      groups.forEach((ordersInDate, dk) => {
+        const dateTotal = ordersInDate.reduce((s, o) => s + (Number(o.total) || 0), 0);
+        html += `
+          <div class="space-y-2.5">
+            <div class="flex items-center justify-between bg-emerald-950 text-emerald-200 px-3.5 py-2 rounded-xl text-xs font-bold">
+              <span>${formatDisplayDateGroup(dk)}</span>
+              <span class="font-mono">মোট: ${ordersInDate.length} টি মেমো • ৳${dateTotal.toLocaleString()}</span>
             </div>
+            ${ordersInDate.map(ord => `
+              <div class="bg-white border border-emerald-200 hover:border-emerald-500 rounded-xl p-4 shadow-2xs transition flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="space-y-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="font-mono font-extrabold text-slate-900 text-sm">#${ord.id}</span>
+                    <span class="text-[11px] font-bold bg-emerald-100 text-emerald-900 px-2 py-0.5 rounded-full">✓ ${ord.status || 'Confirmed'}</span>
+                    <span class="text-[11px] font-bold bg-slate-100 text-slate-700 px-2 py-0.5 rounded">${ord.source || 'Web Store'}</span>
+                    <span class="text-[11px] text-slate-500">${ord.date || ''}</span>
+                  </div>
+                  <div class="text-xs text-slate-800">
+                    <strong>ক্রেতা:</strong> ${ord.customer?.name || ''} • <span class="font-mono">${ord.customer?.phone || ''}</span>
+                  </div>
+                  <div class="text-[11px] text-slate-500">
+                    মোট আইটেম: <strong>${(ord.items || []).length} টি</strong> (${(ord.items || []).map(i => `${i.name} × ${i.qty} ${i.unit || 'PCS'}`).join(', ')})
+                  </div>
+                </div>
+
+                <div class="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0">
+                  <div class="text-base font-extrabold text-emerald-700 font-mono">৳${(ord.total || 0).toLocaleString()}</div>
+                  <div class="flex items-center gap-1.5">
+                    <button onclick="openA5MemoForOrder('${ord.id}', false)" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer">
+                      🧾 মেমো দেখুন
+                    </button>
+                    <button onclick="openA5MemoForOrder('${ord.id}', true)" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold cursor-pointer">
+                      🖨️ A5 প্রিন্ট
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
           </div>
-        </div>
-      `).join('');
+        `;
+      });
+
+      container.innerHTML = html;
     }
 
     function openLiveOrdersModal() {
       const m = document.getElementById('live-orders-modal');
       m.classList.remove('hidden');
       m.classList.add('flex');
+      updateOrderDateTabStyles();
       fetchCloudOrders(false);
     }
 
@@ -791,45 +1031,73 @@
     function renderCloudOrdersModal() {
       const container = document.getElementById('cloud-orders-list');
       if (!container) return;
-      const list = getAllMergedOrders();
+
+      const allList = getAllMergedOrders();
+      const list = filterOrdersByDateMode(allList, orderDateMode, orderSpecificDate);
+
       if (list.length === 0) {
-        container.innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">এখনো ক্লাউডে কোনো অর্ডার জমা পড়েনি। মোবাইল অ্যাপ বা ওয়েবসাইট থেকে অর্ডার করলে এখানে দেখা যাবে!</div>`;
+        const msg = orderDateMode === 'today'
+          ? 'আজকের তারিখে এখনো কোনো নতুন অর্ডার আসেনি। পুরনো ব্যাক-ডেটের অর্ডার দেখতে উপরের "ব্যাক-ডেট অর্ডার" বাটনে ক্লিক করুন।'
+          : 'এই তারিখে কোনো অর্ডার পাওয়া যায়নি।';
+        container.innerHTML = `<div class="text-center py-10 text-slate-500 text-sm">${msg}</div>`;
         return;
       }
-      container.innerHTML = list.map(ord => `
-        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs space-y-2.5">
-          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
-            <div>
-              <span class="font-mono font-extrabold text-slate-900 text-sm">#${ord.id}</span>
-              <span class="ml-2 text-[11px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded">${ord.source || 'App/Web'}</span>
-              <span class="ml-1 text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">${ord.status || 'Confirmed'}</span>
-              <div class="text-[11px] text-slate-500 mt-0.5">${ord.date || ''}</div>
+
+      const groups = new Map();
+      list.forEach(ord => {
+        const dk = getOrderDateKey(ord);
+        if (!groups.has(dk)) groups.set(dk, []);
+        groups.get(dk).push(ord);
+      });
+
+      let html = '';
+      groups.forEach((ordersInDate, dk) => {
+        const dayTotal = ordersInDate.reduce((s, o) => s + (Number(o.total) || 0), 0);
+        html += `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between bg-slate-900 text-amber-300 px-3.5 py-2 rounded-xl text-xs font-bold">
+              <span>${formatDisplayDateGroup(dk)}</span>
+              <span class="font-mono">${ordersInDate.length} টি অর্ডার • ৳${dayTotal.toLocaleString()}</span>
             </div>
-            <div class="text-right">
-              <div class="text-base font-extrabold text-orange-600 font-mono">৳${(ord.total || 0).toLocaleString()}</div>
-              <div class="text-[11px] text-slate-500">${ord.payment || 'COD'}</div>
-            </div>
+            ${ordersInDate.map(ord => `
+              <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-2xs space-y-2.5">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                  <div>
+                    <span class="font-mono font-extrabold text-slate-900 text-sm">#${ord.id}</span>
+                    <span class="ml-2 text-[11px] font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded">${ord.source || 'App/Web'}</span>
+                    <span class="ml-1 text-[11px] font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">${ord.status || 'Confirmed'}</span>
+                    <div class="text-[11px] text-slate-500 mt-0.5">${ord.date || ''}</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-base font-extrabold text-orange-600 font-mono">৳${(ord.total || 0).toLocaleString()}</div>
+                    <div class="text-[11px] text-slate-500">${ord.payment || 'COD'}</div>
+                  </div>
+                </div>
+                <div class="text-xs text-slate-700 bg-slate-50 p-2.5 rounded-lg">
+                  <div><strong>ক্রেতা:</strong> ${ord.customer?.name || ''} | <strong>মোবাইল:</strong> <span class="font-mono">${ord.customer?.phone || ''}</span></div>
+                  <div><strong>ঠিকানা:</strong> ${ord.customer?.address || ''}</div>
+                  <div class="mt-1.5 pt-1.5 border-t border-slate-200 space-y-0.5">
+                    ${(ord.items || []).map(it => `<div class="flex justify-between"><span>• ${it.name} [${it.model}] × ${it.qty} ${it.unit}</span><span class="font-mono font-bold">৳${it.price * it.qty}</span></div>`).join('')}
+                  </div>
+                </div>
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+                  <div class="flex gap-1.5">
+                    <button onclick="openA5MemoForOrder('${ord.id}', false)" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold cursor-pointer">🧾 মেমো দেখুন</button>
+                    <button onclick="openA5MemoForOrder('${ord.id}', true)" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 text-xs font-extrabold cursor-pointer">🖨️ A5 প্রিন্ট</button>
+                  </div>
+                  <div class="flex gap-1.5">
+                    <button onclick="updateCloudOrderStatus('${ord.id}', 'Confirmed')" class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold cursor-pointer">Confirmed</button>
+                    <button onclick="updateCloudOrderStatus('${ord.id}', 'Packed')" class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 hover:bg-amber-100 text-xs font-bold cursor-pointer">Packed</button>
+                    <button onclick="updateCloudOrderStatus('${ord.id}', 'Delivered')" class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-bold cursor-pointer">Delivered ✓</button>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
           </div>
-          <div class="text-xs text-slate-700 bg-slate-50 p-2.5 rounded-lg">
-            <div><strong>ক্রেতা:</strong> ${ord.customer?.name || ''} | <strong>মোবাইল:</strong> <span class="font-mono">${ord.customer?.phone || ''}</span></div>
-            <div><strong>ঠিকানা:</strong> ${ord.customer?.address || ''}</div>
-            <div class="mt-1.5 pt-1.5 border-t border-slate-200 space-y-0.5">
-              ${(ord.items || []).map(it => `<div class="flex justify-between"><span>• ${it.name} [${it.model}] × ${it.qty} ${it.unit}</span><span class="font-mono font-bold">৳${it.price * it.qty}</span></div>`).join('')}
-            </div>
-          </div>
-          <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
-            <div class="flex gap-1.5">
-              <button onclick="openA5MemoForOrder('${ord.id}', false)" class="px-3 py-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold cursor-pointer">🧾 মেমো দেখুন</button>
-              <button onclick="openA5MemoForOrder('${ord.id}', true)" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 hover:bg-amber-400 text-xs font-extrabold cursor-pointer">🖨️ A5 প্রিন্ট</button>
-            </div>
-            <div class="flex gap-1.5">
-              <button onclick="updateCloudOrderStatus('${ord.id}', 'Confirmed')" class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold cursor-pointer">Confirmed</button>
-              <button onclick="updateCloudOrderStatus('${ord.id}', 'Packed')" class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 hover:bg-amber-100 text-xs font-bold cursor-pointer">Packed</button>
-              <button onclick="updateCloudOrderStatus('${ord.id}', 'Delivered')" class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 text-xs font-bold cursor-pointer">Delivered ✓</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
+        `;
+      });
+
+      container.innerHTML = html;
     }
 
     // =========================================================
@@ -1106,12 +1374,15 @@
       const payment = document.querySelector('input[name="payment-method"]:checked').value;
       const { subtotal, deliveryFee, grandTotal } = getCartTotals();
       const orderNo = 'NCH-' + Math.floor(100000 + Math.random() * 900000);
-      const dateStr = new Date().toLocaleString('bn-BD', { dateStyle: 'medium', timeStyle: 'short' });
+      const now = new Date();
+      const dateStr = now.toLocaleString('bn-BD', { dateStyle: 'medium', timeStyle: 'short' });
+      const dateKey = getLocalDateKey(now);
 
       const orderPayload = {
         id: orderNo,
         source: 'Web Store',
-        timestamp: Date.now(),
+        timestamp: now.getTime(),
+        dateKey: dateKey,
         date: dateStr,
         customer: { name: shop ? `${name} (${shop})` : name, phone, address },
         payment,
