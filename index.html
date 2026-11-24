@@ -83,6 +83,12 @@
         </span>
       </div>
       <div class="flex items-center gap-3 ml-auto">
+        <!-- অ্যাডমিন রেট ম্যানেজার বাটন -->
+        <button onclick="openRateManagerModal()" class="hidden admin-only-btn bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/40 px-3 py-1 rounded-full font-bold text-xs items-center gap-1.5 transition cursor-pointer">
+          <span>💰 রেট আপডেট</span>
+          <span id="updated-rate-count" class="bg-blue-400 text-slate-950 px-1.5 py-0.2 rounded-full font-mono text-[11px]">0</span>
+        </button>
+
         <!-- আলাদা কনফার্মড মেমো অপশন বাটন -->
         <button onclick="openConfirmedMemosModal()" class="bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 px-3 py-1 rounded-full font-bold text-xs flex items-center gap-1.5 transition cursor-pointer">
           <span>🧾 আজকের মেমো (A5)</span>
@@ -125,6 +131,9 @@
           </a>
 
           <div class="flex items-center gap-1.5 lg:hidden">
+            <button onclick="openRateManagerModal()" class="hidden admin-only-btn bg-blue-950 border border-blue-700 text-blue-300 px-2.5 py-2 rounded-xl text-xs font-bold cursor-pointer">
+              💰 রেট
+            </button>
             <button onclick="openConfirmedMemosModal()" class="bg-emerald-950 border border-emerald-700 text-emerald-300 px-2.5 py-2 rounded-xl text-xs font-bold cursor-pointer">
               🧾 মেমো (<span id="mobile-memo-count">0</span>)
             </button>
@@ -168,6 +177,11 @@
 
         <!-- Desktop Actions -->
         <div class="hidden lg:flex items-center gap-2.5">
+          <!-- অ্যাডমিন রেট আপডেট বাটন -->
+          <button onclick="openRateManagerModal()" class="hidden admin-only-btn items-center gap-2 bg-blue-950/90 hover:bg-blue-900 text-blue-300 border border-blue-500/40 px-3.5 py-2.5 rounded-xl text-sm font-bold transition cursor-pointer">
+            <span>💰 রেট আপডেট</span>
+          </button>
+
           <!-- আলাদা কনফার্মড মেমো বাটন -->
           <button onclick="openConfirmedMemosModal()" class="flex items-center gap-2 bg-emerald-950/90 hover:bg-emerald-900 text-emerald-300 border border-emerald-500/40 px-3.5 py-2.5 rounded-xl text-sm font-bold transition cursor-pointer">
             <span>🧾 কনফার্মড মেমো</span>
@@ -232,6 +246,30 @@
       </button>
     </div>
   </main>
+
+  <!-- INDIVIDUAL PRODUCT RATE MANAGER MODAL (ADMIN) -->
+  <div id="rate-manager-modal" class="fixed inset-0 bg-slate-950/75 z-50 hidden items-center justify-center p-4 overflow-y-auto no-print">
+    <div class="bg-white rounded-2xl max-w-4xl w-full overflow-hidden shadow-2xl border border-slate-200 my-8 flex flex-col max-h-[90vh]">
+      <div class="bg-slate-900 text-white px-5 py-4 flex items-center justify-between shrink-0">
+        <div>
+          <h3 class="font-bold text-lg text-amber-400">💰 আলাদাভাবে প্রোডাক্ট রেট আপডেট</h3>
+          <p class="text-[11px] text-slate-400">যেকোনো নির্দিষ্ট প্রোডাক্টের পাশে নতুন রেট লিখে Enter বা "সেভ" চাপুন</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="downloadUpdatedRatesCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold cursor-pointer">
+            ⬇ CSV ডাউনলোড
+          </button>
+          <button onclick="closeRateManagerModal()" class="text-slate-400 hover:text-white px-2 cursor-pointer">✕</button>
+        </div>
+      </div>
+
+      <div class="p-3.5 bg-slate-100 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <input type="text" id="rate-manager-search" oninput="renderRateManagerList()" placeholder="নির্দিষ্ট পণ্যের নাম বা মডেল লিখে খুঁজুন..." class="flex-1 min-w-[200px] bg-white border border-slate-300 rounded-xl px-3.5 py-2 text-xs outline-none" />
+        <span class="text-xs font-bold text-slate-700">আলাদা আপডেট করা রেট: <span id="rate-mgr-updated-count" class="font-mono text-blue-700">0</span> টি</span>
+      </div>
+      <div id="rate-manager-list" class="p-4 overflow-y-auto space-y-2 bg-slate-50 flex-1"></div>
+    </div>
+  </div>
 
   <!-- CART DRAWER -->
   <div id="cart-backdrop" onclick="toggleCart(false)" class="fixed inset-0 bg-slate-950/60 z-50 hidden no-print"></div>
@@ -447,7 +485,6 @@
         </div>
       </div>
 
-      <!-- Date Wise Filter Tabs for Confirmed Memos -->
       <div class="px-4 pt-3 pb-2 bg-emerald-900/10 border-b border-emerald-100 flex flex-wrap items-center justify-between gap-2 shrink-0">
         <div class="flex flex-wrap items-center gap-1.5">
           <button onclick="setMemoDateMode('today')" id="memo-tab-today" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-emerald-700 text-white">
@@ -494,7 +531,6 @@
         </div>
       </div>
 
-      <!-- Date-Wise Filter Bar for Orders -->
       <div class="px-4 py-3 bg-slate-100 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2 shrink-0">
         <div class="flex flex-wrap items-center gap-1.5">
           <button onclick="setOrderDateMode('today')" id="ord-tab-today" class="px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer bg-slate-900 text-amber-400">
@@ -536,9 +572,6 @@
   </div>
 
   <script>
-    // =========================================================
-    // FIREBASE REALTIME DATABASE CONFIGURATION (PRIVACY ENABLED)
-    // =========================================================
     const FIREBASE_DB_URL = "https://new-city-hardware-c8da1-default-rtdb.firebaseio.com";
     const ADMIN_SECRET_PASS = "nch2026";
 
@@ -550,7 +583,7 @@
       if (entered === ADMIN_SECRET_PASS) {
         isAdminMode = true;
         localStorage.setItem('nch_is_admin', 'true');
-        alert("অ্যাডমিন মোড চালু হয়েছে! এখন সবার অর্ডার দেখতে পাবেন।");
+        alert("অ্যাডমিন মোড চালু হয়েছে! এখন প্রতিটি প্রোডাক্টের রেট আলাদাভাবে আপডেট করতে পারবেন।");
       } else if (entered !== null) {
         alert("ভুল পাসওয়ার্ড!");
       }
@@ -559,27 +592,188 @@
       localStorage.removeItem('nch_is_admin');
     }
 
-    if (isAdminMode) {
-      document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.admin-only-btn').forEach(btn => {
+    function applyAdminVisibility() {
+      document.querySelectorAll('.admin-only-btn').forEach(btn => {
+        if (isAdminMode) {
           btn.classList.remove('hidden');
           btn.classList.add('flex');
-        });
+        } else {
+          btn.classList.add('hidden');
+          btn.classList.remove('flex');
+        }
       });
     }
+
+    document.addEventListener('DOMContentLoaded', applyAdminVisibility);
 
     let knownOrderIds = new Set(JSON.parse(localStorage.getItem('nch_known_cloud_ids') || '[]'));
     let cloudOrdersCache = [];
     let localConfirmedOrders = JSON.parse(localStorage.getItem('nch_local_confirmed_memos') || '[]');
     let activeMemoOrder = null;
 
-    // Date-wise filtering states ('today' | 'backdate' | 'specific' | 'all')
     let orderDateMode = 'today';
     let orderSpecificDate = '';
     let memoDateMode = 'today';
     let memoSpecificDate = '';
 
-    // Helper: Get local YYYY-MM-DD key
+    // =========================================================
+    // INDIVIDUAL PRODUCT RATE UPDATE SYSTEM
+    // =========================================================
+    let customRatesMap = JSON.parse(localStorage.getItem('nch_custom_product_rates') || '{}');
+
+    function getRateKey(product) {
+      return `${encodeURIComponent(product.model)}__${encodeURIComponent(product.unit)}`;
+    }
+
+    function applyCustomRatesToProducts() {
+      let updatedCount = 0;
+      PRODUCTS.forEach(p => {
+        if (typeof p.basePrice !== 'number') {
+          p.basePrice = p.price;
+        }
+        const key = getRateKey(p);
+        if (customRatesMap[key] !== undefined && !isNaN(parseFloat(customRatesMap[key]))) {
+          p.price = parseFloat(customRatesMap[key]);
+          p.isCustomRate = true;
+          updatedCount++;
+        } else {
+          p.price = p.basePrice;
+          p.isCustomRate = false;
+        }
+      });
+      const badge = document.getElementById('updated-rate-count');
+      if (badge) badge.textContent = updatedCount;
+      const mgrBadge = document.getElementById('rate-mgr-updated-count');
+      if (mgrBadge) mgrBadge.textContent = updatedCount;
+    }
+
+    async function syncCustomRatesFromFirebase() {
+      try {
+        const res = await fetch(`${FIREBASE_DB_URL}/product_rates.json`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && typeof data === 'object') {
+          customRatesMap = { ...customRatesMap, ...data };
+          localStorage.setItem('nch_custom_product_rates', JSON.stringify(customRatesMap));
+          applyCustomRatesToProducts();
+          renderProducts();
+        }
+      } catch (e) {}
+    }
+
+    async function persistCustomRate(product, newPrice, reRender = true) {
+      const key = getRateKey(product);
+      customRatesMap[key] = Number(newPrice);
+      localStorage.setItem('nch_custom_product_rates', JSON.stringify(customRatesMap));
+      applyCustomRatesToProducts();
+      if (reRender) renderProducts();
+
+      try {
+        await fetch(`${FIREBASE_DB_URL}/product_rates/${key}.json`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Number(newPrice))
+        });
+      } catch (e) {}
+    }
+
+    async function inlineSaveRate(productId) {
+      if (!isAdminMode) return;
+      const p = PRODUCTS.find(item => item.id === productId);
+      const inp = document.getElementById(`inline-rate-${productId}`);
+      if (!p || !inp) return;
+      const val = parseFloat(inp.value);
+      if (isNaN(val) || val < 0) return;
+
+      await persistCustomRate(p, val, true);
+      showToast(`✓ "${p.name}" এর রেট ৳${val} আপডেট হয়েছে!`);
+    }
+
+    function openRateManagerModal() {
+      if (!isAdminMode) return;
+      const m = document.getElementById('rate-manager-modal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+      renderRateManagerList();
+    }
+
+    function closeRateManagerModal() {
+      const m = document.getElementById('rate-manager-modal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function renderRateManagerList() {
+      const container = document.getElementById('rate-manager-list');
+      if (!container) return;
+
+      const q = (document.getElementById('rate-manager-search')?.value || '').toLowerCase().trim();
+      const list = PRODUCTS.filter(p =>
+        !q || p.name.toLowerCase().includes(q) || String(p.model).toLowerCase().includes(q)
+      ).slice(0, 80);
+
+      if (list.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-sm text-slate-500">কোনো পণ্য পাওয়া যায়নি।</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(p => `
+        <div class="bg-white border border-slate-200 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] font-mono font-bold bg-slate-900 text-amber-400 px-2 py-0.5 rounded">#${p.model}</span>
+              <span class="text-[11px] font-mono font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded">${p.unit}</span>
+              ${p.isCustomRate ? `<span class="text-[10px] font-bold bg-blue-100 text-blue-800 px-2 py-0.5 rounded">আপডেটেড (মূল: ৳${p.basePrice})</span>` : ''}
+            </div>
+            <div class="font-bold text-slate-900 text-sm mt-1 truncate">${p.name}</div>
+          </div>
+          <div class="flex items-center gap-2 shrink-0">
+            <input type="number" step="any" min="0" id="mgr-rate-input-${p.id}" value="${p.price}" onkeydown="if(event.key==='Enter'){event.preventDefault();saveManagerRowRate(${p.id});}" class="w-24 border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-extrabold font-mono text-right outline-none focus:border-amber-500" />
+            <button onclick="saveManagerRowRate(${p.id})" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-orange-600 text-white text-xs font-bold cursor-pointer">
+              সেভ
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function saveManagerRowRate(productId) {
+      if (!isAdminMode) return;
+      const p = PRODUCTS.find(item => item.id === productId);
+      const inp = document.getElementById(`mgr-rate-input-${productId}`);
+      if (!p || !inp) return;
+      const val = parseFloat(inp.value);
+      if (isNaN(val) || val < 0) return;
+
+      await persistCustomRate(p, val, true);
+      renderRateManagerList();
+      showToast(`"${p.name}" -> ৳${val} সেভ হয়েছে!`);
+    }
+
+    function downloadUpdatedRatesCSV() {
+      const header = ["name", "model", "unit", "category", "price", "image"];
+      const rows = PRODUCTS.map(p => [
+        `"${String(p.name).replace(/"/g, '""')}"`,
+        `"${String(p.model).replace(/"/g, '""')}"`,
+        `"${String(p.unit).replace(/"/g, '""')}"`,
+        `"${String(p.cat).replace(/"/g, '""')}"`,
+        p.price,
+        `"${String(p.image || '').replace(/"/g, '""')}"`
+      ].join(","));
+      const csvContent = "\uFEFF" + [header.join(","), ...rows].join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "products_updated_rates.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("আপডেটেড রেটসহ CSV ডাউনলোড হয়েছে!");
+    }
+
+    // =========================================================
+    // DATE & ORDER FUNCTIONS
+    // =========================================================
     function getLocalDateKey(dateInput) {
       const d = dateInput ? new Date(dateInput) : new Date();
       if (isNaN(d.getTime())) return '';
@@ -612,15 +806,9 @@
 
     function filterOrdersByDateMode(list, mode, specificDate) {
       const todayKey = getLocalDateKey();
-      if (mode === 'today') {
-        return list.filter(o => getOrderDateKey(o) === todayKey);
-      }
-      if (mode === 'backdate') {
-        return list.filter(o => getOrderDateKey(o) < todayKey);
-      }
-      if (mode === 'specific' && specificDate) {
-        return list.filter(o => getOrderDateKey(o) === specificDate);
-      }
+      if (mode === 'today') return list.filter(o => getOrderDateKey(o) === todayKey);
+      if (mode === 'backdate') return list.filter(o => getOrderDateKey(o) < todayKey);
+      if (mode === 'specific' && specificDate) return list.filter(o => getOrderDateKey(o) === specificDate);
       return list;
     }
 
@@ -636,10 +824,7 @@
     }
 
     function handleOrderSpecificDateChange(val) {
-      if (!val) {
-        setOrderDateMode('today');
-        return;
-      }
+      if (!val) { setOrderDateMode('today'); return; }
       orderSpecificDate = val;
       orderDateMode = 'specific';
       updateOrderDateTabStyles();
@@ -667,10 +852,7 @@
     }
 
     function handleMemoSpecificDateChange(val) {
-      if (!val) {
-        setMemoDateMode('today');
-        return;
-      }
+      if (!val) { setMemoDateMode('today'); return; }
       memoSpecificDate = val;
       memoDateMode = 'specific';
       updateMemoDateTabStyles();
@@ -716,9 +898,7 @@
           if (isAdminMode) fetchCloudOrders(false);
           else refreshOrderAndMemoViews();
         }
-      } catch (err) {
-        console.error("Firebase Sync Error:", err);
-      }
+      } catch (err) {}
     }
 
     async function updateCloudOrderStatus(orderId, newStatus) {
@@ -736,9 +916,7 @@
         });
         showToast(`অর্ডার #${orderId} এর স্ট্যাটাস "${newStatus}" করা হয়েছে!`);
         fetchCloudOrders(false);
-      } catch (err) {
-        showToast("স্ট্যাটাস আপডেট হয়েছে!");
-      }
+      } catch (err) {}
     }
 
     async function fetchCloudOrders(notifyOnNew = true) {
@@ -748,13 +926,9 @@
       }
       try {
         const res = await fetch(`${FIREBASE_DB_URL}/orders.json`);
-        if (!res.ok) {
-          refreshOrderAndMemoViews();
-          return;
-        }
+        if (!res.ok) { refreshOrderAndMemoViews(); return; }
         const data = await res.json();
         const list = data ? Object.values(data).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)) : [];
-
         list.forEach(ord => {
           if (ord.id && !knownOrderIds.has(ord.id)) {
             knownOrderIds.add(ord.id);
@@ -765,7 +939,6 @@
           }
         });
         localStorage.setItem('nch_known_cloud_ids', JSON.stringify([...knownOrderIds]));
-
         cloudOrdersCache = list;
         refreshOrderAndMemoViews();
       } catch (err) {
@@ -776,10 +949,8 @@
     function refreshOrderAndMemoViews() {
       const allOrders = getAllMergedOrders();
       const todayKey = getLocalDateKey();
-
       const todayOrders = allOrders.filter(o => getOrderDateKey(o) === todayKey);
       const backdateOrders = allOrders.filter(o => getOrderDateKey(o) < todayKey);
-
       const allConfirmed = allOrders.filter(o => ['Confirmed', 'Packed', 'Delivered'].includes(o.status || 'Confirmed'));
       const todayMemos = allConfirmed.filter(o => getOrderDateKey(o) === todayKey);
       const backdateMemos = allConfirmed.filter(o => getOrderDateKey(o) < todayKey);
@@ -790,7 +961,6 @@
       setTxt('ord-count-today', todayOrders.length);
       setTxt('ord-count-backdate', backdateOrders.length);
       setTxt('ord-count-all', allOrders.length);
-
       setTxt('memo-count-today', todayMemos.length);
       setTxt('memo-count-backdate', backdateMemos.length);
       setTxt('memo-count-all', allConfirmed.length);
@@ -822,13 +992,9 @@
       } catch (e) {}
     }
 
-    // =========================================================
-    // A5 MEMO VIEWER & SEPARATE CONFIRMED MEMOS PANEL
-    // =========================================================
     function openA5MemoForOrder(orderId, autoPrint = false) {
       const order = getAllMergedOrders().find(o => o.id === orderId);
       if (!order) return;
-
       activeMemoOrder = order;
       const items = order.items || [];
       const subtotal = order.subtotal ?? items.reduce((s, it) => s + (it.price * it.qty), 0);
@@ -865,14 +1031,10 @@
 
       closeLiveOrdersModal();
       closeConfirmedMemosModal();
-
       const modal = document.getElementById('a5-memo-modal');
       modal.classList.remove('hidden');
       modal.classList.add('flex');
-
-      if (autoPrint) {
-        setTimeout(() => window.print(), 300);
-      }
+      if (autoPrint) setTimeout(() => window.print(), 300);
     }
 
     function closeA5MemoModal() {
@@ -909,11 +1071,9 @@
     function renderConfirmedMemosList() {
       const container = document.getElementById('confirmed-memos-list');
       if (!container) return;
-
       const q = (document.getElementById('memo-search-input')?.value || '').toLowerCase().trim();
       const allOrders = getAllMergedOrders();
       let confirmedMemos = allOrders.filter(o => ['Confirmed', 'Packed', 'Delivered'].includes(o.status || 'Confirmed'));
-
       confirmedMemos = filterOrdersByDateMode(confirmedMemos, memoDateMode, memoSpecificDate);
 
       if (q) {
@@ -967,16 +1127,11 @@
                     মোট আইটেম: <strong>${(ord.items || []).length} টি</strong> (${(ord.items || []).map(i => `${i.name} × ${i.qty} ${i.unit || 'PCS'}`).join(', ')})
                   </div>
                 </div>
-
                 <div class="flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0 border-t sm:border-t-0 pt-2 sm:pt-0">
                   <div class="text-base font-extrabold text-emerald-700 font-mono">৳${(ord.total || 0).toLocaleString()}</div>
                   <div class="flex items-center gap-1.5">
-                    <button onclick="openA5MemoForOrder('${ord.id}', false)" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer">
-                      🧾 মেমো দেখুন
-                    </button>
-                    <button onclick="openA5MemoForOrder('${ord.id}', true)" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold cursor-pointer">
-                      🖨️ A5 প্রিন্ট
-                    </button>
+                    <button onclick="openA5MemoForOrder('${ord.id}', false)" class="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer">🧾 মেমো দেখুন</button>
+                    <button onclick="openA5MemoForOrder('${ord.id}', true)" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold cursor-pointer">🖨️ A5 প্রিন্ট</button>
                   </div>
                 </div>
               </div>
@@ -984,7 +1139,6 @@
           </div>
         `;
       });
-
       container.innerHTML = html;
     }
 
@@ -1005,7 +1159,6 @@
     function renderCloudOrdersModal() {
       const container = document.getElementById('cloud-orders-list');
       if (!container) return;
-
       const allList = getAllMergedOrders();
       const list = filterOrdersByDateMode(allList, orderDateMode, orderSpecificDate);
 
@@ -1070,13 +1223,9 @@
           </div>
         `;
       });
-
       container.innerHTML = html;
     }
 
-    // =========================================================
-    // PRODUCT CATALOG — loaded from products.csv on GitHub
-    // =========================================================
     const PRODUCTS_CSV_URL = "products.csv";
     let PRODUCTS = [];
 
@@ -1087,7 +1236,6 @@
         const text = await res.text();
         const lines = text.trim().split(/\r?\n/);
         const products = [];
-
         for (let i = 1; i < lines.length; i++) {
           const cols = [];
           let cur = "", inQuote = false;
@@ -1097,22 +1245,16 @@
             cur += ch;
           }
           cols.push(cur);
-
           const name  = (cols[0] || "").trim();
           const model = (cols[1] || "").trim();
           const unit  = (cols[2] || "PC").trim().toUpperCase();
           const cat   = (cols[3] || "General Hardware").trim();
           const price = parseFloat(cols[4]) || 0;
           const image = (cols[5] || "").trim();
-
-          if (name) {
-            products.push({ name, model, unit, cat, price, image });
-          }
+          if (name) products.push({ name, model, unit, cat, price, basePrice: price, image });
         }
         return products;
       } catch (err) {
-        console.error("CSV লোড সমস্যা:", err);
-        if (typeof showToast === "function") showToast("প্রোডাক্ট লোড করতে সমস্যা হয়েছে");
         return [];
       }
     }
@@ -1243,13 +1385,21 @@
               <p class="text-xs text-slate-500 mb-3">${getCategoryBnName(product.cat)}</p>
             </div>
             <div class="pt-2.5 border-t border-slate-100 space-y-2.5">
-              <div class="flex items-baseline justify-between">
-                <div>
-                  <span class="text-xl font-extrabold text-slate-900 font-mono">৳${product.price.toLocaleString()}</span>
-                  <span class="text-xs text-slate-500">/ ${product.unit}</span>
+              ${isAdminMode ? `
+                <div class="flex items-center justify-between gap-1.5 bg-blue-50/70 border border-blue-200 rounded-xl px-2.5 py-1.5">
+                  <span class="text-[11px] font-bold text-blue-900">রেট (৳):</span>
+                  <input type="number" step="any" min="0" id="inline-rate-${product.id}" value="${product.price}" onkeydown="if(event.key==='Enter'){event.preventDefault();inlineSaveRate(${product.id});}" class="w-20 bg-white border border-blue-300 rounded-lg px-2 py-0.5 text-xs font-extrabold font-mono text-right outline-none focus:border-blue-600" />
+                  <button onclick="inlineSaveRate(${product.id})" class="bg-blue-700 hover:bg-blue-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg cursor-pointer">Save</button>
                 </div>
-                <span class="text-[11px] font-bold text-emerald-700">✓ ইন স্টক</span>
-              </div>
+              ` : `
+                <div class="flex items-baseline justify-between gap-1">
+                  <div>
+                    <span class="text-xl font-extrabold text-slate-900 font-mono">৳${product.price.toLocaleString()}</span>
+                    <span class="text-xs text-slate-500">/ ${product.unit}</span>
+                  </div>
+                  <span class="text-[11px] font-bold text-emerald-700">✓ ইন স্টক</span>
+                </div>
+              `}
               <div class="flex items-center gap-2">
                 <div class="flex items-center border border-slate-200 rounded-xl bg-slate-50 overflow-hidden">
                   <button onclick="updateCardQty(${product.id}, -1)" class="w-7 h-9 font-bold text-slate-700 bg-slate-100 cursor-pointer">−</button>
@@ -1400,15 +1550,18 @@
         unit: item.unit,
         cat: item.cat,
         price: item.price,
+        basePrice: item.price,
         image: item.image || ""
       }));
 
+      applyCustomRatesToProducts();
       PRODUCTS.forEach(p => { state.cardQuantities[p.id] = 1; });
 
       renderCategoryTabs();
       renderProducts();
       renderCart();
       refreshOrderAndMemoViews();
+      syncCustomRatesFromFirebase();
       fetchCloudOrders(false);
       setInterval(() => fetchCloudOrders(true), 5000);
     });
