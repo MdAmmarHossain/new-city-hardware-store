@@ -25,61 +25,34 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* A5 পেজ প্রিন্ট সেটিংস */
+    /* A4 সিলেক্ট থাকলেও একদম Top-Left থেকে A5 সাইজে প্রিন্ট হওয়ার সেটিংস */
     @page {
-      size: A5 portrait;
-      margin: 4mm;
+      size: A4 portrait;
+      margin: 0mm;
     }
 
     @media print {
       html, body {
-        width: 148mm !important;
-        height: auto !important;
         margin: 0 !important;
         padding: 0 !important;
         background: #ffffff !important;
-        overflow: visible !important;
       }
       body * {
         visibility: hidden !important;
-      }
-      #a5-memo-modal {
-        position: static !important;
-        display: block !important;
-        width: 100% !important;
-        height: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: transparent !important;
-        overflow: visible !important;
-      }
-      #a5-memo-modal > div {
-        max-width: 100% !important;
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        box-shadow: none !important;
-        border: none !important;
-        background: transparent !important;
-      }
-      #a5-memo-modal > div > div:last-child {
-        padding: 0 !important;
-        margin: 0 !important;
-        background: #ffffff !important;
       }
       #a5-memo-print-sheet, #a5-memo-print-sheet * {
         visibility: visible !important;
       }
       #a5-memo-print-sheet {
-        position: static !important;
-        left: auto !important;
-        top: auto !important;
-        width: 100% !important;
-        max-width: 100% !important;
+        position: fixed !important;
+        top: 4mm !important;
+        left: 4mm !important;
+        width: 140mm !important;
+        max-width: 140mm !important;
         min-height: auto !important;
         height: auto !important;
         margin: 0 !important;
-        padding: 3mm !important;
+        padding: 3.5mm !important;
         border: 1.5px solid #0f172a !important;
         box-shadow: none !important;
         background: #ffffff !important;
