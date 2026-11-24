@@ -1,0 +1,42 @@
+body { font-family: 'Hind Siliguri', 'Inter', sans-serif; background-color: #F8FAFC; color: #0F172A; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* A4 সিলেক্ট থাকলেও একদম ওপর থেকে মাঝখানে (Top-Center) A5 সাইজে প্রিন্ট হওয়ার সেটিংস */
+    @page {
+      size: A4 portrait;
+      margin: 0mm;
+    }
+
+    @media print {
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+      }
+      body * {
+        visibility: hidden !important;
+      }
+      #a5-memo-print-sheet, #a5-memo-print-sheet * {
+        visibility: visible !important;
+      }
+      #a5-memo-print-sheet {
+        position: fixed !important;
+        top: 4mm !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 140mm !important;
+        max-width: 140mm !important;
+        min-height: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 3.5mm !important;
+        border: 1.5px solid #0f172a !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        font-size: 11px !important;
+        display: block !important;
+      }
+      .no-print { display: none !important; }
+    }
